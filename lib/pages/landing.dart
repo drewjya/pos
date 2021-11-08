@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos/components/body.dart';
 
 class LandingPages extends StatelessWidget {
   const LandingPages({Key? key}) : super(key: key);
@@ -6,11 +7,13 @@ class LandingPages extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Welcome"),
+        title: const Text(
+          "Welcome",
+        ),
+        elevation: 0,
+        centerTitle: true,
       ),
-      body: const Center(
-        child: Text('Isi'),
-      ),
+      body: const Body(),
     );
   }
 }

@@ -69,23 +69,60 @@ class CashierPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 OrderList order = data.orderList[index];
                 return Container(
-                  color: Colors.red,
                   width: size.width * 0.8,
-                  child: Card(
-                    child: Row(
-                      children: [
-                        Text(order.name),
-                        Text(order.subtotal().toString()),
-                      ],
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.red,
+                  ),
+                  child: ListTile(
+                    title: Text(
+                      order.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      order.qty.toString(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    trailing: Text(
+                      order.subtotal().toStringAsFixed(2),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 );
               },
             ),
             Text(
-              'Total: ' + data.grandtotal().toString(),
+              'Total: ' + data.grandtotal().toStringAsFixed(2),
               textAlign: TextAlign.right,
-            )
+            ),
+            TextButton(
+              onPressed: () {},
+              child: SizedBox(
+                width: size.width * 0.8,
+                child: const Center(
+                  child: Text(
+                    'Bayar',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.green,
+              ),
+            ),
           ],
         ),
       ),

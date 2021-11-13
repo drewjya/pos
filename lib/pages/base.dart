@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos/pages/home.dart';
+import 'package:pos/pages/product/product_page.dart';
 
 class BasePage extends StatelessWidget {
   const BasePage({Key? key}) : super(key: key);
@@ -22,7 +23,13 @@ class BasePage extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text('Product'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProductPage()),
+                  );
+                },
               ),
               ListTile(
                 title: const Text('Transaction'),

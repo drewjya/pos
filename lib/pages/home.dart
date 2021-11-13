@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pos/database/produk.dart';
+import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/pages/cashier/cashier_page.dart';
 
@@ -12,15 +12,15 @@ class HomeCashier extends StatefulWidget {
 
 class _HomeCashierState extends State<HomeCashier> {
   int _currentCount = 0;
-  List<Produk> hahah = [
-    Produk(
+  List<Product> hahah = [
+    Product(
       idproduct: '01',
       name: 'Pulpen',
       harga: 20000,
       hargaModal: 10000,
       stock: 20,
     ),
-    Produk(
+    Product(
       idproduct: '02',
       name: 'Kertas',
       harga: 23000,
@@ -29,17 +29,17 @@ class _HomeCashierState extends State<HomeCashier> {
     ),
   ];
   List<OrderList> currOrder = [];
-  addOrder(Produk produk, int index) {
+  addOrder(Product product, int index) {
     OrderList curr = OrderList(
-      idproduct: produk.idproduct,
-      name: produk.name,
-      price: produk.harga,
+      idproduct: product.idproduct,
+      name: product.name,
+      price: product.harga,
       qty: 1,
-      capital: produk.hargaModal,
+      capital: product.hargaModal,
     );
     bool count = false;
     for (OrderList item in currOrder) {
-      if (item.idproduct == produk.idproduct) {
+      if (item.idproduct == product.idproduct) {
         item.qty += 1;
         count = true;
         break;
@@ -97,7 +97,7 @@ class _HomeCashierState extends State<HomeCashier> {
                       ),
                       child: ListTile(
                         title: Text(current.name),
-                        subtitle: Text(current.harga.toString()),
+                        subtitle: Text(current.harga.toStringAsFixed(2)),
                         trailing: Text("Stock: ${current.stock.toString()}"),
                         onTap: () => addOrder(current, index),
                       ),

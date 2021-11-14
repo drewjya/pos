@@ -33,6 +33,8 @@ class _TransactionPageState extends State<TransactionPage> {
               Transaction current = transactions[index];
               return ListTile(
                 title: Text(toNormalDate(current.date)),
+                subtitle: Text("Total Profit : " +
+                    current.grandtotal().toStringAsFixed(2)),
               );
             },
           );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pos/database/boxes.dart';
+import 'package:pos/database/orderlist.dart';
 import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/function/date.dart';
@@ -13,17 +15,21 @@ class CashierPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Box<Product> product = Hive.box<Product>("product");
-    doTransaction(Transaction data) {
+    updateStock(Transaction data) {
       for (var orderList in data.orderList) {
+        final order = OrderList.fromJson(orderList);
         product.values
-            .where((dataP) => dataP.idproduct == orderList.idproduct)
+            .where((dataP) => dataP.idproduct == order.idproduct)
             .forEach((dataP) {
-          dataP.stock -= orderList.qty;
+          dataP.stock -= order.qty;
           dataP.save();
         });
       }
     }
-
+    Future doTransaction(Transaction data) async {
+      final box = Boxes.getTransaction();
+      await box.add(data);
+    }
     Transaction data = transaction;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -82,7 +88,8 @@ class CashierPage extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: data.orderList.length,
               itemBuilder: (context, index) {
-                OrderList order = data.orderList[index];
+                final parsed = data.orderList[index];
+                final order = OrderList.fromJson(parsed);
                 return Container(
                   width: size.width * 0.8,
                   margin:
@@ -124,6 +131,7 @@ class CashierPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 doTransaction(transaction);
+                updateStock(transaction);
                 Navigator.pushReplacement(context,
                     MaterialPageRoute(builder: (context) => const BasePage()));
               },

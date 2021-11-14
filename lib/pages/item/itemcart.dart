@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pos/database/boxes.dart';
+import 'package:pos/database/orderlist.dart';
 import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/pages/cashier/cashier_page.dart';
@@ -35,7 +36,6 @@ class _ItemCartState extends State<ItemCart> {
       currOrder.add(curr);
     }
     _update();
-    debugPrint(currOrder.length.toString());
   }
 
   void _update() {
@@ -51,10 +51,15 @@ class _ItemCartState extends State<ItemCart> {
       sub.add(item.subtotal());
       prov.add(item.profit());
     }
+    List<Map<String, dynamic>> orderL = [];
+
+    for (var item in order) {
+      orderL.add(item.toJson());
+    }
     return Transaction(
       idtrans: 'TRX${order.length}${DateTime.now().hashCode}',
       subtotal: sub,
-      orderList: order,
+      orderList: orderL,
       date: DateTime.now(),
       profit: prov,
     );

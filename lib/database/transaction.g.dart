@@ -19,7 +19,9 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
     return Transaction(
       idtrans: fields[0] as String,
       subtotal: (fields[3] as List).cast<double>(),
-      orderList: (fields[2] as List).cast<OrderList>(),
+      orderList: (fields[2] as List)
+          .map((dynamic e) => (e as Map).cast<String, dynamic>())
+          .toList(),
       date: fields[1] as DateTime,
       profit: (fields[4] as List).cast<double>(),
     );

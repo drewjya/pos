@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos/pages/item/itemcart.dart';
-import 'package:pos/pages/product/product_page.dart';
+import 'package:pos/pages/product_page.dart';
 import 'package:pos/pages/transaction/transaction_page.dart';
 
 class BasePage extends StatelessWidget {

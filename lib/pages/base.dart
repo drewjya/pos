@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pos/pages/home.dart';
+import 'package:pos/pages/item/itemcart.dart';
 import 'package:pos/pages/product/product_page.dart';
+import 'package:pos/pages/transaction/transaction_page.dart';
 
 class BasePage extends StatelessWidget {
   const BasePage({Key? key}) : super(key: key);
@@ -33,13 +34,19 @@ class BasePage extends StatelessWidget {
               ),
               ListTile(
                 title: const Text('Transaction'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const TransactionPage()),
+                  );
+                },
               ),
             ],
           ),
         ),
       ),
-      body: const HomeCashier(),
+      body: const ItemCart(),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pos/database/product.dart';
+import 'package:pos/database/transaction.dart';
 import 'package:pos/pages/base.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,8 +11,12 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory? dir = await getExternalStorageDirectory();
   await Hive.initFlutter(dir!.path);
-  Hive.registerAdapter(ProductAdapter());
+  Hive
+    ..registerAdapter(ProductAdapter())
+    ..registerAdapter(TransactionAdapter());
+
   await Hive.openBox<Product>('product');
+  await Hive.openBox<Transaction>('transaction');
   runApp(const MyApp());
 }
 

@@ -15,6 +15,10 @@ class _ProductPageState extends State<ProductPage> {
   final _quantity = TextEditingController();
   final _price = TextEditingController();
   final _modalPrice = TextEditingController();
+  final _editname = TextEditingController();
+  final _editquantity = TextEditingController();
+  final _editprice = TextEditingController();
+  final _editmodalPrice = TextEditingController();
 
   @override
   void dispose() {
@@ -41,6 +45,19 @@ class _ProductPageState extends State<ProductPage> {
   Future deleteAll() async {
     final box = Boxes.getProduct();
     await box.clear();
+  }
+
+  Future update(index) async {
+    final box = Boxes.getProduct();
+    Product update = Product(
+        idproduct: "PR" +
+            _editname.text.substring(0, 2) +
+            _editprice.text.substring(0, 2),
+        name: _editname.text,
+        harga: double.parse(_editprice.text),
+        hargaModal: double.parse(_editmodalPrice.text),
+        stock: int.parse(_editquantity.text));
+    box.putAt(index, update);
   }
 
   @override
@@ -86,6 +103,96 @@ class _ProductPageState extends State<ProductPage> {
                     trailing: Text(
                       product[index].stock.toString(),
                     ),
+                    onTap: () {
+                      // product[index].stock += 1;
+                      _editname.text = product[index].name;
+                      _editprice.text = product[index].harga.toStringAsFixed(2);
+                      _editmodalPrice.text =
+                          product[index].hargaModal.toStringAsFixed(2);
+                      _editquantity.text = product[index].stock.toString();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            BuildContext dialogContex = context;
+                            return AlertDialog(
+                              scrollable: true,
+                              title: const Text('Edit Product'),
+                              content: Builder(builder: (context) {
+                                return SizedBox(
+                                  width: size.width * 0.9,
+                                  height: size.height * 0.4,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Form(
+                                      child: Column(
+                                        children: <Widget>[
+                                          TextFormField(
+                                            controller: _editname,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Name',
+                                            ),
+                                            validator: (name) =>
+                                                name != null && name.isEmpty
+                                                    ? 'Enter Product Name'
+                                                    : null,
+                                          ),
+                                          TextFormField(
+                                            controller: _editquantity,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Quantity',
+                                            ),
+                                            validator: (qty) =>
+                                                qty != null && qty.isEmpty
+                                                    ? 'Enter Product Quantity'
+                                                    : null,
+                                          ),
+                                          TextFormField(
+                                            controller: _editprice,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Price',
+                                            ),
+                                            validator: (price) =>
+                                                price != null && price.isEmpty
+                                                    ? 'Enter Product price'
+                                                    : null,
+                                          ),
+                                          TextFormField(
+                                            controller: _editmodalPrice,
+                                            decoration: const InputDecoration(
+                                              labelText: 'Modal Price',
+                                            ),
+                                            validator: (modal) =>
+                                                modal != null && modal.isEmpty
+                                                    ? 'Enter Product Modal'
+                                                    : null,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                              actions: [
+                                Center(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(),
+                                    child: SizedBox(
+                                      width: size.width * 0.5,
+                                      child: const Center(
+                                        child: Text("Submit"),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      update(index);
+                                      Navigator.pop(dialogContex);
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          });
+                      // update(index, product[index]);
+                    },
                   ),
                 );
               });

@@ -142,7 +142,6 @@ class CashierPage extends StatelessWidget {
                 backgroundColor: Colors.green,
               ),
             ),
-           
           ],
         ),
       ),

@@ -5,14 +5,14 @@ import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/pages/cashier/cashier_page.dart';
 
-class HomeCashier extends StatefulWidget {
-  const HomeCashier({Key? key}) : super(key: key);
+class ItemCart extends StatefulWidget {
+  const ItemCart({Key? key}) : super(key: key);
 
   @override
-  State<HomeCashier> createState() => _HomeCashierState();
+  State<ItemCart> createState() => _ItemCartState();
 }
 
-class _HomeCashierState extends State<HomeCashier> {
+class _ItemCartState extends State<ItemCart> {
   int _currentCount = 0;
   List<OrderList> currOrder = [];
   addOrder(Product product, int index) {
@@ -63,55 +63,48 @@ class _HomeCashierState extends State<HomeCashier> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ValueListenableBuilder<Box<Product>>(
-              valueListenable: Boxes.getProduct().listenable(),
-              builder: (context, box, _) {
-                final product = box.values.toList().cast<Product>();
-                if (product.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No Product yet!',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 25,
-                      ),
+      body: ValueListenableBuilder<Box<Product>>(
+        valueListenable: Boxes.getProduct().listenable(),
+        builder: (context, box, _) {
+          final product = box.values.toList().cast<Product>();
+          if (product.isEmpty) {
+            return const Center(
+              child: Text(
+                'No Product yet!',
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: 25,
+                ),
+              ),
+            );
+          }
+          return ListView.builder(
+            itemCount: product.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              var current = product[index];
+              return Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(15, 0, 15, 5),
+                    decoration: BoxDecoration(
+                      // color: Colors.amberAccent,
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: product.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    var current = product[index];
-                    return Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(5),
-                          margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-                          decoration: BoxDecoration(
-                            // color: Colors.amberAccent,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: ListTile(
-                            title: Text(current.name),
-                            subtitle: Text(current.harga.toStringAsFixed(2)),
-                            trailing:
-                                Text("Stock: ${current.stock.toString()}"),
-                            onTap: () => addOrder(current, index),
-                          ),
-                        )
-                      ],
-                    );
-                  },
-                );
-              },
-            )
-          ],
-        ),
+                    child: ListTile(
+                      title: Text(current.name),
+                      subtitle: Text(current.harga.toStringAsFixed(2)),
+                      trailing: Text("Stock: ${current.stock.toString()}"),
+                      onTap: () => addOrder(current, index),
+                      enabled: (current.stock <= 0) ? false : true,
+                    ),
+                  )
+                ],
+              );
+            },
+          );
+        },
       ),
       floatingActionButton: (_currentCount != 0)
           ? FloatingActionButton.extended(
@@ -124,7 +117,6 @@ class _HomeCashierState extends State<HomeCashier> {
                             transaction: data,
                           )),
                 );
-                
               },
               label: Text(_currentCount.toString()),
               icon: const Icon(

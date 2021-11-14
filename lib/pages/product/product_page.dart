@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pos/database/boxes.dart';
 import 'package:pos/database/product.dart';
 
 class ProductPage extends StatefulWidget {
@@ -9,84 +11,84 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  final List<Product> produk = [];
+  final _name = TextEditingController();
+  final _quantity = TextEditingController();
+  final _price = TextEditingController();
+  final _modalPrice = TextEditingController();
 
   @override
   void dispose() {
+    _name.dispose();
+    _modalPrice.dispose();
+    _price.dispose();
+    _quantity.dispose();
     super.dispose();
+  }
+
+  Future addProduct() async {
+    Product newProduct = Product(
+      idproduct:
+          "PR" + _name.text.substring(0, 2) + _price.text.substring(0, 2),
+      name: _name.text,
+      harga: double.parse(_price.text),
+      hargaModal: double.parse(_modalPrice.text),
+      stock: int.parse(_quantity.text),
+    );
+    final box = Boxes.getProduct();
+    box.add(newProduct);
+  }
+
+  Future deleteAll() async {
+    final box = Boxes.getProduct();
+    await box.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    TextEditingController _name = TextEditingController();
-    TextEditingController _quantity = TextEditingController();
-    TextEditingController _price = TextEditingController();
-    TextEditingController _modalPrice = TextEditingController();
-
-    addProduct() {
-      Product newProduct = Product(
-        idproduct:
-            "PR" + _name.text.substring(0, 2) + _price.text.substring(0, 2),
-        name: _name.text,
-        harga: double.parse(_price.text),
-        hargaModal: double.parse(_modalPrice.text),
-        stock: int.parse(_quantity.text),
-      );
-      produk.add(newProduct);
-      _name.clear();
-      _price.clear();
-      _modalPrice.clear();
-      _quantity.clear();
-      setState(() {});
-    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Products'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              deleteAll();
+            },
+            icon: const Icon(Icons.delete),
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: produk.length,
-        itemBuilder: (context, index) {
-          if (produk.isEmpty) {
+      body: ValueListenableBuilder<Box<Product>>(
+        valueListenable: Boxes.getProduct().listenable(),
+        builder: (context, box, _) {
+          final product = box.values.toList().cast<Product>();
+          if (product.isEmpty) {
             return const Center(
               child: Text(
-                'Please Input Your Product!',
+                'No Product yet!',
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 25,
                 ),
               ),
             );
-          } else {
-            Product data = produk[index];
-            return Container(
-              margin: const EdgeInsets.all(10),
-              child: Card(
-                  elevation: 1,
-                  
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            Text(data.name),
-                            Text(data.harga.toString()),
-                            Text(
-                              data.hargaModal.toString(),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Text(
-                          data.stock.toString(),
-                        ),
-                      ),
-                    ],
-                  )),
-            );
           }
+          return ListView.builder(
+              itemCount: product.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 5),
+                  color: Colors.amberAccent,
+                  child: ListTile(
+                    title: Text(product[index].name),
+                    subtitle: Text(product[index].harga.toStringAsFixed(2)),
+                    trailing: Text(
+                      product[index].stock.toString(),
+                    ),
+                  ),
+                );
+              });
         },
       ),
       floatingActionButton: FloatingActionButton(
@@ -112,24 +114,39 @@ class _ProductPageState extends State<ProductPage> {
                                 decoration: const InputDecoration(
                                   labelText: 'Name',
                                 ),
+                                validator: (name) =>
+                                    name != null && name.isEmpty
+                                        ? 'Enter Product Name'
+                                        : null,
                               ),
                               TextFormField(
                                 controller: _quantity,
                                 decoration: const InputDecoration(
                                   labelText: 'Quantity',
                                 ),
+                                validator: (qty) => qty != null && qty.isEmpty
+                                    ? 'Enter Product Quantity'
+                                    : null,
                               ),
                               TextFormField(
                                 controller: _price,
                                 decoration: const InputDecoration(
                                   labelText: 'Price',
                                 ),
+                                validator: (price) =>
+                                    price != null && price.isEmpty
+                                        ? 'Enter Product price'
+                                        : null,
                               ),
                               TextFormField(
                                 controller: _modalPrice,
                                 decoration: const InputDecoration(
                                   labelText: 'Modal Price',
                                 ),
+                                validator: (modal) =>
+                                    modal != null && modal.isEmpty
+                                        ? 'Enter Product Modal'
+                                        : null,
                               ),
                             ],
                           ),

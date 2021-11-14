@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pos/database/boxes.dart';
 import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/pages/cashier/cashier_page.dart';
@@ -12,22 +14,6 @@ class HomeCashier extends StatefulWidget {
 
 class _HomeCashierState extends State<HomeCashier> {
   int _currentCount = 0;
-  List<Product> hahah = [
-    Product(
-      idproduct: '01',
-      name: 'Pulpen',
-      harga: 20000,
-      hargaModal: 10000,
-      stock: 20,
-    ),
-    Product(
-      idproduct: '02',
-      name: 'Kertas',
-      harga: 23000,
-      hargaModal: 12000,
-      stock: 20,
-    ),
-  ];
   List<OrderList> currOrder = [];
   addOrder(Product product, int index) {
     OrderList curr = OrderList(
@@ -80,29 +66,47 @@ class _HomeCashierState extends State<HomeCashier> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ListView.builder(
-              itemCount: hahah.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                var current = hahah[index];
-                return Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(5),
-                      margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-                      decoration: BoxDecoration(
-                        // color: Colors.amberAccent,
-                        borderRadius: BorderRadius.circular(5),
+            ValueListenableBuilder<Box<Product>>(
+              valueListenable: Boxes.getProduct().listenable(),
+              builder: (context, box, _) {
+                final product = box.values.toList().cast<Product>();
+                if (product.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No Product yet!',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 25,
                       ),
-                      child: ListTile(
-                        title: Text(current.name),
-                        subtitle: Text(current.harga.toStringAsFixed(2)),
-                        trailing: Text("Stock: ${current.stock.toString()}"),
-                        onTap: () => addOrder(current, index),
-                      ),
-                    )
-                  ],
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: product.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    var current = product[index];
+                    return Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+                          decoration: BoxDecoration(
+                            // color: Colors.amberAccent,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: ListTile(
+                            title: Text(current.name),
+                            subtitle: Text(current.harga.toStringAsFixed(2)),
+                            trailing:
+                                Text("Stock: ${current.stock.toString()}"),
+                            onTap: () => addOrder(current, index),
+                          ),
+                        )
+                      ],
+                    );
+                  },
                 );
               },
             )
@@ -120,6 +124,7 @@ class _HomeCashierState extends State<HomeCashier> {
                             transaction: data,
                           )),
                 );
+                
               },
               label: Text(_currentCount.toString()),
               icon: const Icon(

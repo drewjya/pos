@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:pos/database/product.dart';
 import 'package:pos/database/transaction.dart';
 import 'package:pos/function/date.dart';
+import 'package:pos/pages/base.dart';
 
 class CashierPage extends StatelessWidget {
   final Transaction transaction;
@@ -9,6 +12,18 @@ class CashierPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Box<Product> product = Hive.box<Product>("product");
+    doTransaction(Transaction data) {
+      for (var orderList in data.orderList) {
+        product.values
+            .where((dataP) => dataP.idproduct == orderList.idproduct)
+            .forEach((dataP) {
+          dataP.stock -= orderList.qty;
+          dataP.save();
+        });
+      }
+    }
+
     Transaction data = transaction;
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -107,7 +122,11 @@ class CashierPage extends StatelessWidget {
               textAlign: TextAlign.right,
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                doTransaction(transaction);
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const BasePage()));
+              },
               child: SizedBox(
                 width: size.width * 0.8,
                 child: const Center(
@@ -123,6 +142,7 @@ class CashierPage extends StatelessWidget {
                 backgroundColor: Colors.green,
               ),
             ),
+           
           ],
         ),
       ),

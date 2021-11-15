@@ -39,7 +39,7 @@ class _ProductPageState extends State<ProductPage> {
       stock: int.parse(_quantity.text),
     );
     final box = Boxes.getProduct();
-    box.add(newProduct);
+    await box.add(newProduct);
   }
 
   Future deleteAll() async {
@@ -57,7 +57,7 @@ class _ProductPageState extends State<ProductPage> {
         harga: double.parse(_editprice.text),
         hargaModal: double.parse(_editmodalPrice.text),
         stock: int.parse(_editquantity.text));
-    box.putAt(index, update);
+    await box.putAt(index, update);
   }
 
   @override
